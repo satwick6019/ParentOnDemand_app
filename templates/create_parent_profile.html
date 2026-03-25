@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- 🔵 NAVBAR -->
+<nav class="w-full px-8 py-4 flex justify-between items-center bg-white shadow-sm sticky top-0 z-50">
+    <h1 class="text-xl font-semibold">ParentOnDemand</h1>
+
+    <div class="flex gap-6 text-sm text-gray-600">
+        <a href="/" class="hover:text-black">Home</a>
+        <a href="/parent/" class="hover:text-black">Dashboard</a>
+    </div>
+</nav>
+
+<!-- 🔵 MAIN -->
+<div class="min-h-[90vh] flex items-center justify-center px-6 py-10">
+
+    <div class="bg-white w-full max-w-2xl p-8 rounded-xl shadow-md">
+
+        <!-- HEADER -->
+        <div class="mb-6">
+            <h2 class="text-2xl font-semibold">
+                {% if profile %}Update Profile{% else %}Create Profile{% endif %}
+            </h2>
+            <p class="text-gray-500 text-sm">
+                Provide accurate information to ensure trust and approval.
+            </p>
+        </div>
+
+        <!-- ERROR -->
+        {% if error %}
+            <div class="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <!-- FORM -->
+        <form method="POST" enctype="multipart/form-data" class="space-y-5">
+            {% csrf_token %}
+
+            <!-- NAME -->
+            <input type="text" name="name" placeholder="Full Name"
+                value="{{ profile.name|default:'' }}"
+                class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500">
+
+            <!-- AGE -->
+            <input type="number" name="age" placeholder="Age"
+                value="{{ profile.age|default:'' }}"
+                class="w-full px-4 py-2 border rounded-md">
+
+            <!-- CITY -->
+            <input type="text" name="city" placeholder="City"
+                value="{{ profile.city|default:'' }}"
+                class="w-full px-4 py-2 border rounded-md">
+
+            <!-- ROW -->
+            <div class="grid grid-cols-2 gap-4">
+
+                <select name="parent_type" class="px-4 py-2 border rounded-md">
+                    <option value="">Parent Type</option>
+                    <option value="father" {% if profile.parent_type == "father" %}selected{% endif %}>Father</option>
+                    <option value="mother" {% if profile.parent_type == "mother" %}selected{% endif %}>Mother</option>
+                </select>
+
+                <select name="service_type" class="px-4 py-2 border rounded-md">
+                    <option value="">Service Type</option>
+                    <option value="call" {% if profile.service_type == "call" %}selected{% endif %}>On Call</option>
+                    <option value="onsite" {% if profile.service_type == "onsite" %}selected{% endif %}>On Site</option>
+                </select>
+
+            </div>
+
+            <!-- PRICE -->
+            <input type="number" name="price" placeholder="Price (₹)"
+                value="{{ profile.price|default:'' }}"
+                class="w-full px-4 py-2 border rounded-md">
+
+            <!-- DESCRIPTION -->
+            <textarea name="description" placeholder="Description"
+                class="w-full px-4 py-2 border rounded-md h-24">{{ profile.description|default:'' }}</textarea>
+
+            <!-- FILE UPLOAD -->
+            <div>
+                <label class="text-sm text-gray-600">Upload Photo</label>
+                <input type="file" name="photo" class="mt-1">
+            </div>
+
+            <div>
+                <label class="text-sm text-gray-600">Upload Aadhar</label>
+                <input type="file" name="aadhar" class="mt-1">
+            </div>
+
+            <!-- BUTTON -->
+            <button type="submit"
+                class="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                {% if profile %}Update Profile{% else %}Create Profile{% endif %}
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% comment %} <h2>Create Parent Profile</h2>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <input type="text" name="name" placeholder="Name" value="{{ profile.name|default:'' }}"><br><br>
+    <input type="number" name="age" placeholder="Age" value="{{ profile.age|default:'' }}"><br><br>
+    <input type="text" name="city" placeholder="City" value="{{ profile.city|default:'' }}"><br><br>
+
+    <select name="parent_type" value="{{ profile.parent_type|default:'' }}">
+        <option value="father">Father</option>
+        <option value="mother">Mother</option>
+    </select><br><br>
+
+    <select name="service_type" value="{{ profile.service_type|default:'' }}">
+        <option value="call">On Call</option>
+        <option value="onsite">On Site</option>
+    </select><br><br>
+
+    <input type="number" name="price" placeholder="Price" value="{{ profile.price|default:'' }}"><br><br>
+
+    <textarea name="description" placeholder="Description" value="{{ profile.description|default:'' }}"></textarea><br><br>
+
+    <label>Upload Photo:</label>
+    <input type="file" name="photo" value="{{ profile.photo|default:'' }}"><br><br>
+
+    <label>Upload Aadhar:</label>
+    <input type="file" name="aadhar"  value="{{ profile.aadhar|default:'' }}"><br><br>
+
+    <button type="submit">Submit</button>
+</form>
+<bottom><p>User: {{ request.user }} | Logged in: {{ request.user.is_authenticated }}</p></bottom> {% endcomment %}

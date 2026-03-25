@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load custom_tags %}
+{% block content %}
+
+<!-- 🔵 NAVBAR -->
+<nav class="w-full px-8 py-4 flex justify-between items-center bg-white shadow-sm sticky top-0 z-50">
+
+    <!-- LEFT -->
+    <h1 class="text-xl font-semibold">ParentOnDemand</h1>
+
+    <!-- RIGHT -->
+    <div class="flex items-center gap-6">
+
+        <!-- User -->
+        <span class="text-sm text-gray-600 hidden md:block">
+            {{ request.user.username }}
+        </span>
+
+        <!-- Logout -->
+        <a href="{% url 'logout' %}">
+            <button class="text-sm text-red-600 hover:text-red-700">
+                Logout
+            </button>
+        </a>
+
+    </div>
+
+</nav>
+
+<!-- 🔵 MAIN CONTAINER -->
+<div class="max-w-7xl mx-auto px-6 py-10 animate-fade-in">
+
+    <!-- 🔷 HEADER -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold mb-2">Available Profiles</h2>
+        <p class="text-gray-500">Browse and connect based on your needs.</p>
+    </div>
+
+    <!-- 🔷 FILTER BAR (UI only for now) -->
+    <form method="GET" class="bg-white p-4 rounded-lg shadow-sm mb-8 flex flex-wrap gap-4">
+
+    <input type="text" name="city" placeholder="City"
+        value="{{ request.GET.city }}"
+        class="border px-3 py-2 rounded-md">
+
+    <select name="service_type" class="border px-3 py-2 rounded-md">
+        <option value="">Service Type</option>
+        <option value="call">On Call</option>
+        <option value="onsite">On Site</option>
+    </select>
+
+    <select name="parent_type" class="border px-3 py-2 rounded-md">
+        <option value="">Parent Type</option>
+        <option value="father">Father</option>
+        <option value="mother">Mother</option>
+    </select>
+
+    <input type="number" name="max_price" placeholder="Max Price"
+        value="{{ request.GET.max_price }}"
+        class="border px-3 py-2 rounded-md">
+
+    <button type="submit"
+        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 hover:shadow-md active:scale-95 tracking-wide">
+        Apply
+    </button>
+
+</form>
+
+    <!-- 🔷 CARD GRID -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        {% for parent in parents %}
+        <div class="bg-white rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-1 hover:shadow-md transition p-5">
+
+            <!-- Image -->
+            <img src="{{ parent.photo.url }}" class="w-full h-48 object-cover rounded-lg mb-4">
+
+            <!-- Info -->
+            <h3 class="text-lg font-semibold mb-1">{{ parent.name }}</h3>
+            <p class="text-sm text-gray-500 mb-2">{{ parent.city }}</p>
+
+            <div class="text-sm text-gray-600 mb-3">
+                <p>{{ parent.parent_type }} • {{ parent.service_type }}</p>
+            </div>
+
+            <p class="text-sm text-gray-500 mb-4 line-clamp-3">
+                {{ parent.description }}
+            </p>
+
+            <!-- Price + Action -->
+            <div class="flex justify-between items-center">
+
+                <span class="font-semibold text-blue-600">
+                    ₹{{ parent.price }}
+                </span>
+
+                {% if parent.id in request_dict %}
+
+    {% if request_dict|get_item:parent.id == 'pending' %}
+        <span class="px-3 py-1 text-sm bg-yellow-100 text-yellow-700 rounded-full">
+            Pending
+        </span>
+
+    {% elif request_dict|get_item:parent.id == 'accepted' %}
+        <span class="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full">
+            Accepted
+        </span>
+
+    {% else %}
+        <span class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded-full">
+            Rejected
+        </span>
+    {% endif %}
+
+{% else %}
+
+    <a href="/send-request/{{ parent.id }}/">
+        <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 hover:shadow-md active:scale-95 tracking-wide">
+            Request
+        </button>
+    </a>
+
+{% endif %}
+
+            </div>
+
+        </div>
+        {% empty %}
+        <p>No profiles available.</p>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+
+
+
+
+
+{% comment %} <h1>👨‍🎓 Student Dashboard</h1>
+
+{% for parent in parents %}
+    <div style="border:1px solid black; padding:10px; margin:10px;">
+        
+        <img src="{{ parent.photo.url }}" width="150"><br><br>
+
+        <b>Name:</b> {{ parent.name }} <br>
+        <b>City:</b> {{ parent.city }} <br>
+        <b>Type:</b> {{ parent.parent_type }} <br>
+        <b>Service:</b> {{ parent.service_type }} <br>
+        <b>Price:</b> ₹{{ parent.price }} <br>
+
+        <p>{{ parent.description }}</p>
+
+        <a href="/send-request/{{ parent.id }}/">
+    <button>Interested</button>
+</a>
+
+    </div>
+{% empty %}
+    <p>No parents available 😢</p>
+{% endfor %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div style="
+            padding: 10px;
+            margin: 10px;
+            border-radius: 6px;
+            background-color: #e6f4ea;
+            color: #1e7e34;
+        ">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+<div style="position: fixed; bottom: 10px; right: 10px; text-align: right;">
+
+    <p>
+        User: {{ request.user }} <br>
+        Logged in: {{ request.user.is_authenticated }}
+    </p>
+
+    <a href="{% url 'logout' %}">
+        <button style="
+    padding: 8px 14px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 6px;
+">
+    Logout
+</button>
+    </a>
+    
+
+</div> {% endcomment %}
